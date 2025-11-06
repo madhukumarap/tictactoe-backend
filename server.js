@@ -2,7 +2,7 @@ const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
 const cors = require("cors");
-const { createGame, joinGame, makeMove, getLeaderboard, getPlayerStats, startTimer } = require("./gameManager");
+const { createGame, joinGame, makeMove, getLeaderboard, getPlayerStats, startTimer, resetGame } = require("./gameManager");
 
 const app = express();
 app.use(cors());
@@ -78,7 +78,17 @@ io.on("connection", socket => {
       socket.emit("errorMessage", err.message);
     }
   });
-
+  socket.on("resetGame", ({ gameId }) => {
+    try {
+      console.log(`🔄 Reset request for game ${gameId}`);
+      const game = resetGame(gameId);
+      io.to(gameId).emit("gameReset", game);
+      console.log(`🔄 Game ${gameId} reset successfully`);
+    } catch (err) {
+      console.error(`❌ Error resetting game ${gameId}:`, err.message);
+      socket.emit("errorMessage", err.message);
+    }
+  });
   socket.on("disconnect", () => console.log("❌ Client disconnected"));
 });
 

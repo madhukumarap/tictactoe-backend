@@ -179,6 +179,33 @@ function getPlayerStats(player) {
     winRate: ((stats.wins / (stats.wins + stats.losses)) * 100) || 0
   };
 }
+// Add this to your gameManager.js
+// ADD THIS FUNCTION - Reset Game
+function resetGame(gameId) {
+  const game = games[gameId];
+  if (!game) throw new Error("Game not found");
+  
+  console.log(`🔄 Resetting game ${gameId}`);
+  
+  // Reset game state but keep players and mode
+  game.board = Array(9).fill(null);
+  game.turn = "X";
+  game.winner = null;
+  
+  // Clear any existing timer
+  if (game.timer) {
+    clearTimeout(game.timer);
+    game.timer = null;
+  }
+  
+  // Start new timer for timed games
+  if (game.mode === 'timed') {
+    startTimer(gameId);
+  }
+  
+  return game;
+}
+
 
 // FIXED: Export all necessary functions including startTimer
 module.exports = { 
@@ -189,5 +216,6 @@ module.exports = {
   getLeaderboard,
   getPlayerStats,
   playerStats,
-  startTimer // Added this export
+  startTimer, // Added this export
+  resetGame
 };
